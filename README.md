@@ -7,6 +7,8 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 ## Planned
 - Load & execute remote script
 - Load & execute embedded script
+- Load & execute script from disk
+- Load & execute script from clipboard
 - Compression & encryption support for scripts
 - AMSI Bypass
 - Multiple command support
