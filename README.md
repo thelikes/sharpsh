@@ -1,3 +1,4 @@
+# SharpPwsh
 C# .Net Framework program that uses `RunspaceFactory` for Powershell command execution.
 
 ## Features
@@ -7,6 +8,8 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 - Load & execute remote script
 - Load & execute embedded script
 - Compression & encryption support for scripts
+- AMSI Bypass
+- Multiple command support
 
 ## Install
 Built using .NET Framework v4.5.1 in Visual Studio 2019.

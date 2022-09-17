@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using CommandLine;
 
 // need to add as reference:
 // c:\windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll
@@ -10,22 +11,25 @@ namespace SharpPwsh
 {
     class Program
     {
+        class Options
+        {
+            [Option('c', "cmd", Required = true, HelpText = "Powershell command to run")]
+            public string inputCmd { get; set; }
+        }
         static void Main(string[] args)
         {
-            string cmd = "$ExecutionContext.SessionState.LanguageMode";
-
-            Runspace rs = RunspaceFactory.CreateRunspace();
-            rs.Open();
-
-            // instantiate a PowerShell object
-            PowerShell ps = PowerShell.Create();
-            ps.Runspace = rs;
-
-            while (true)
+            Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                Console.Write("PS> ");
-                cmd = Console.ReadLine();
-                if (String.IsNullOrWhiteSpace(cmd) || cmd == "exit" || cmd == "quit") break;
+
+                Runspace rs = RunspaceFactory.CreateRunspace();
+                rs.Open();
+
+                // instantiate a PowerShell object
+                PowerShell ps = PowerShell.Create();
+                ps.Runspace = rs;
+
+                string cmd = o.inputCmd;
+                if (String.IsNullOrWhiteSpace(cmd)) return;
                 ps.AddScript(cmd);
                 ps.AddCommand("Out-String");
                 PSDataCollection<object> results = new PSDataCollection<object>();
@@ -62,8 +66,9 @@ namespace SharpPwsh
                 string output = string.Join(Environment.NewLine, results.Select(R => R.ToString()).ToArray());
                 ps.Commands.Clear();
                 Console.WriteLine(output);
-            }
-            rs.Close();
+
+                rs.Close();
+            });
         }
     }
 }
