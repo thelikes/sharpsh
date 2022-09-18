@@ -50,3 +50,5 @@ sliver > inline-execute-assembly /tools/SharpPwsh.exe '-b -c invoke-kerberoast -
 Built using .NET Framework v4.5.1 in Visual Studio 2019.
 
 Be sure to add `c:\windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll` as a reference.
+
+The project uses [`dnMerge`](https://github.com/CCob/dnMerge) so it has to be compiled in `Release` mode.
