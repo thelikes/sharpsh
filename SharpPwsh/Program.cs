@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
@@ -23,24 +24,36 @@ namespace SharpPwsh
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
+                string inputCmd = o.inputCmd;
                 string inputURI = o.inputUri;
+                List<string> cmds = new List<string>();
+                // 
                 if (args.Contains(inputURI))
                 {
                     Console.WriteLine("fetch " + inputURI);
-                    FetchURI(inputURI);
+                    string aCmd = FetchURI(inputURI);
+                    cmds.Add(aCmd);
                 }
-                Runspace rs = RunspaceFactory.CreateRunspace();
-                rs.Open();
 
-                // instantiate a PowerShell object
-                PowerShell ps = PowerShell.Create();
-                ps.Runspace = rs;
+                cmds.Add(inputCmd);
+                ExecutePwsh(cmds);
+            });
+        }
+        public static void ExecutePwsh(List<string> cmds)
+        {
+            Runspace rs = RunspaceFactory.CreateRunspace();
+            rs.Open();
 
-                string cmd = o.inputCmd;
+            // instantiate a PowerShell object
+            PowerShell ps = PowerShell.Create();
+            ps.Runspace = rs;
+
+            foreach (string cmd in cmds)
+            {
                 if (String.IsNullOrWhiteSpace(cmd))
                 {
                     Console.WriteLine("error: command string not supplied");
-                    return;
+                    break;
                 }
                 ps.AddScript(cmd);
                 ps.AddCommand("Out-String");
@@ -78,9 +91,9 @@ namespace SharpPwsh
                 string output = string.Join(Environment.NewLine, results.Select(R => R.ToString()).ToArray());
                 ps.Commands.Clear();
                 Console.WriteLine(output);
+            }
 
-                rs.Close();
-            });
+            rs.Close();
         }
 
         public static string FetchURI(string url)
