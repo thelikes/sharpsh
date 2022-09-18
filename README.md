@@ -6,6 +6,23 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 - Load & execute remote script
 - AMSI Bypass
 
+## Usage
+
+```
+SharpPwsh 1.0.0.0
+Copyright c  2022
+
+  -c, --cmd            Required. Powershell command to run
+
+  -u, --uri            URI to fetch remote script
+
+  -b, --bypass-amsi    Bypass AMSI
+
+  --help               Display this help screen.
+
+  --version            Display version information.
+```
+
 ## Examples
 
 ```
