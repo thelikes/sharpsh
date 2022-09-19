@@ -15,8 +15,8 @@ namespace SharpPwsh
     {
         class Options
         {
-            [Option('c', "cmd", Required = true, HelpText = "Powershell command to run")]
-            public string inputCmd { get; set; }
+            [Option('c', "cmd", Required = true, Separator = ',', HelpText = "Powershell command to run")]
+            public IEnumerable<string> inputCmds { get; set; }
             [Option('u', "uri", Required = false, HelpText = "URI to fetch remote script")]
             public string inputUri { get; set; }
             [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
@@ -26,7 +26,7 @@ namespace SharpPwsh
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                string inputCmd = o.inputCmd;
+                IEnumerable<string> inputCmds = o.inputCmds;
                 string inputURI = o.inputUri;
                 bool bypassAmsi = o.bypassAmsi;
                 List<string> cmds = new List<string>();
@@ -46,8 +46,13 @@ namespace SharpPwsh
                     string aCmd = FetchURI(inputURI);
                     cmds.Add(aCmd);
                 }
-
-                cmds.Add(inputCmd);
+                
+                // add input commands
+                foreach (string cmd in inputCmds)
+                {
+                    cmds.Add(cmd);
+                }
+                
                 ExecutePwsh(cmds);
             });
         }
