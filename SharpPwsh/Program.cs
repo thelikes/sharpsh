@@ -5,6 +5,7 @@ using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Net;
 using System.Text;
+using System.Windows;
 using CommandLine;
 
 // need to add as reference:
@@ -18,13 +19,16 @@ namespace SharpPwsh
         {
             [Option('c', "cmd", Required = true, Separator = ',', HelpText = "Powershell command to run")]
             public IEnumerable<string> inputCmds { get; set; }
-            [Option('u', "uri", Required = false, Separator = ',', HelpText = "URI to fetch remote script")]
+            [Option('u', "uri", Required = false, Separator = ',', HelpText = "Fetch script from URI")]
             public  IEnumerable<string> inputUri { get; set; }
+            [Option('p', "clipboard", Required = false, HelpText = "Fetch script from clipboard")]
+            public bool clipboard { get; set; }
             [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
             public bool bypassAmsi { get; set; }
             [Option('e', "encoded", Required = false, HelpText = "Encodeded command (base64)")]
             public bool encodedCmd { get; set; }
         }
+        [STAThread]
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
@@ -33,8 +37,10 @@ namespace SharpPwsh
                 IEnumerable<string> inputURIs = o.inputUri;
                 bool bypassAmsi = o.bypassAmsi;
                 bool encodedCmd = o.encodedCmd;
+                bool clipboard = o.clipboard;
                 List<string> cmds = new List<string>();
-                
+                string clipboardText = "";
+
                 // bypass amsi
                 if (bypassAmsi)
                 {
@@ -55,7 +61,13 @@ namespace SharpPwsh
                     }
                     cmds.Add(aCmd);
                 }
-                
+
+                // read in clipboard sript
+                if (clipboard)
+                {
+                    clipboardText = System.Windows.Clipboard.GetText(TextDataFormat.Text);
+                    cmds.Add(clipboardText);
+                }
                 // add input commands
                 foreach (string cmd in inputCmds)
                 {
