@@ -48,6 +48,11 @@ namespace SharpPwsh
                 foreach (string inputURI in inputURIs)
                 {
                     string aCmd = FetchURI(inputURI);
+                    if (aCmd == null)
+                    {
+                        Console.WriteLine("[!] Error requesting " + inputURI);
+                        return;
+                    }
                     cmds.Add(aCmd);
                 }
                 
