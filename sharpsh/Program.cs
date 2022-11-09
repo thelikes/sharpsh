@@ -23,8 +23,9 @@ namespace sharpsh
             public IEnumerable<string> inputUri { get; set; }
             [Option('p', "clipboard", Required = false, HelpText = "Fetch script from clipboard")]
             public bool clipboard { get; set; }
-            [Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
-            public bool bypassAmsi { get; set; }
+            // disabling as intended use is with execute-assembly -i -M -E 
+            //[Option('b', "bypass-amsi", Required = false, HelpText = "Bypass AMSI")]
+            //public bool bypassAmsi { get; set; }
             [Option('e', "encoded", Required = false, HelpText = "Encodeded command (base64)")]
             public bool encodedCmd { get; set; }
         }
@@ -35,18 +36,20 @@ namespace sharpsh
             {
                 IEnumerable<string> inputCmds = o.inputCmds;
                 IEnumerable<string> inputURIs = o.inputUri;
-                bool bypassAmsi = o.bypassAmsi;
+                //bool bypassAmsi = o.bypassAmsi;
                 bool encodedCmd = o.encodedCmd;
                 bool clipboard = o.clipboard;
                 List<string> cmds = new List<string>();
                 string clipboardText = "";
 
                 // bypass amsi
+                /*
                 if (bypassAmsi)
                 {
                     // using powershell to avoid p/d invoke
                     cmds.Add("echo 'enter your bypass here'");
                 }
+                */
 
                 // fetch remote script and execute
                 foreach (string inputURI in inputURIs)
@@ -66,6 +69,7 @@ namespace sharpsh
                     clipboardText = System.Windows.Clipboard.GetText(TextDataFormat.Text);
                     cmds.Add(clipboardText);
                 }
+
                 // add input commands
                 foreach (string cmd in inputCmds)
                 {
